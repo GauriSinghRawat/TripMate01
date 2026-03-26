@@ -12,8 +12,17 @@
   "dependencies": {
     "ejs": "^3.1.10",
     "ejs-mate": "^4.0.0",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
+    "joi": "^18.0.2",
     "method-override": "^3.0.0",
-    "mongoose": "^8.19.1"
-  }
+    "mongoose": "^8.23.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GauriSinghRawat/TripMate01.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GauriSinghRawat/TripMate01/issues"
+  },
+  "homepage": "https://github.com/GauriSinghRawat/TripMate01#readme"
 }
