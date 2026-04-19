@@ -28,7 +28,13 @@ default: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
             ref:'Review'
         }
     ]
+    ,
+      owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }
 });
+
 const Listing=mongoose.model('Listing',listingSchema);
 // Delete all reviews when listing is deleted
 listingSchema.post("findOneAndDelete", async (listing) => {

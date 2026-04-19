@@ -11,6 +11,17 @@ const expresserror = require('./utils/expresserror.js');
 const { listingSchema,reviewSchema } = require('./schema.js');
 const initDB=require('./init/index.js');
 const Review=require('./models/review.js');
+const listingsRouter=require('./routes/listing.js');
+const reviewsRouter=require('./routes/review.js');
+const userRouter=require('./routes/user.js');
+
+
+
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const flash = require("connect-flash");
+const User = require("./models/user.js");
 app.use(methodOverride('_method'));
 main().then(() => {
     console.log("Database connection established");
@@ -46,6 +57,50 @@ const validateListing = (req, res, next) => {
             next();
         }
     };
+    
+    const sessionOptions = {
+  secret: "mysupersecretcode",
+  resave: false,
+  
+
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  },
+};
+
+app.use(session(sessionOptions));
+app.use(flash());
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
+//  app.get("/demouser", async (req, res) => {
+//   let fakeUser = new User({ 
+//     email: "demo@example.com", 
+//     username: "demoUser"
+//  });
+//  let registeredUser = await User.register(fakeUser, "helloworld");
+//  res.send(registeredUser);
+// });
+
+
+app.use('/listings', listingsRouter);
+ app.use("/listings/:id/reviews", reviewsRouter);
+app.use('/users', userRouter);
+
+
 //index route
 app.get("/listings",wrapAsync( async (req, res) => {
     const allListings = await Listing.find({});
@@ -70,6 +125,7 @@ app.post("/listings",
        console.log(req.body);
     const newListing = new Listing(req.body.listing);
     await newListing.save();
+    req.flash("success", "Listing created successfully!");
     res.redirect("/listings");
    
 }));
@@ -130,6 +186,8 @@ app.use((err,req,res,next)=>{
     res.status(statusCode).render("error",{message});
     // res.status(statusCode).send(message);
 });
+
+
 app.listen(8080, () => {
     console.log('Server is running on port 8080');
 });
